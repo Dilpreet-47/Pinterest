@@ -13,7 +13,7 @@ app.use(cors({
 
 app.use(express.json({ limit: "16kb" })); // limit prevents huge JSON attacks
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
-app.use(express.static("")); // To store local files/images temporarily
+app.use(express.static("/public")); // To store local files/images temporarily
 app.use(cookieParser());
 
 // Routes Declaration

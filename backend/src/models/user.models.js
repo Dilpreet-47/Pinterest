@@ -18,14 +18,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [8, "Password must be at least 8 characters long"],
-      select : false,
       validate: {
         validator: function(value) {
             // Ensure password isn't just a string of spaces
             return !value.toLowerCase().includes("password");
         },
         message: "Password cannot contain the word 'password'"
-    }
+    } 
     },
     refreshToken: {
       type: String,
@@ -34,14 +33,16 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  if(!this.password){
+    throw new Error("Password not found");
+  }
   return await bcrypt.compare(password, this.password);
 };
 
@@ -70,4 +71,5 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;
