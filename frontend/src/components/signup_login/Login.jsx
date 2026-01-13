@@ -1,6 +1,29 @@
-import React from 'react'
-
+import { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 const Login = ({onClose}) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate();
+
+    const handleLogin = async() => {
+       
+        try {
+          const response = await axios.post('http://localhost:5000/api/v1/users/login', {
+            email,
+            password
+        })
+        const token = response.data.token;
+        localStorage.setItem('accessToken', token);
+        navigate('/feed');
+        console.log(response.data);
+        } catch (error) {
+            setErrorMessage(error.response.data.message);
+            console.log(error.response.data.message);
+        }
+    }
   return (
     <div>
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -24,17 +47,21 @@ const Login = ({onClose}) => {
             <form className="space-y-3 w-full" onSubmit={(e) => e.preventDefault()}>
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email" 
                 className="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-400" 
               />
               <input 
                 type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password" 
                 className="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-400" 
               />
 
 
-              <button className="w-full bg-red-600 text-white py-3 rounded-full font-bold text-lg hover:bg-red-700 transition">
+              <button onClick={() => handleLogin()} className="w-full bg-red-600 text-white py-3 rounded-full font-bold text-lg hover:bg-red-700 transition">
                 Login
               </button>
             </form>
@@ -45,6 +72,7 @@ const Login = ({onClose}) => {
             >
               Close
             </button>
+            {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
           </div>
         </div>
     </div>

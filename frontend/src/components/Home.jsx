@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Login from './signup_login/Login.jsx';
 import Signup from './signup_login/Signup.jsx';
 
-
 const Home = () => {
   const [isSignupModalOpen, setSignupModalOpen] = useState(false);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
@@ -13,7 +12,7 @@ const Home = () => {
       {/* Navigation */}
       <nav className='flex justify-between w-full px-8 py-6'>
         <h1 className='text-4xl font-bold text-red-600'>Pinterest</h1>
-        <div className='space-x-4'>
+        <div className='space-x-4'> 
           <button 
             onClick={() => setLoginModalOpen(true)}
             className='text-gray-700 font-semibold hover:text-black'>Login</button>
@@ -27,7 +26,7 @@ const Home = () => {
       </nav>
 
       {/* Main Content Area */}
-      <div className="flex-grow flex items-center justify-center">
+      <div className="flex items-center justify-center">
          <h2 className="text-5xl font-semibold text-center">Get your next <br/> <span className="text-green-700">weekly meal plan</span></h2>
       </div>
 

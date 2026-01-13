@@ -1,10 +1,9 @@
 import {asyncHandler }from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js";
 import {ApiRes} from "../utils/ApiRes.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
 import User from "../models/user.models.js";
 
-const registerUser = asyncHandler(async (req, res) => {
+const signupUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     throw new ApiError(400, "All fields are required");
@@ -27,9 +26,19 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "something went wrong while registering the user");
   }
 
+  const accessToken = createdUser.generateAccessToken();
+
+  const options = { 
+    httpOnly : true,
+    secure : true,
+    sameSite : "strict",
+    maxAge : 15 * 60 * 60 * 1000
+  }
+
   return res
   .status(201)
-  .json(new ApiRes(201, createdUser, "User registered Successfully"));
+  .cookie("accessToken", accessToken, options)
+  .json(new ApiRes(201, createdUser, "User registered Successfully", accessToken));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -65,13 +74,15 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const options = {
     httpOnly : true,
-    secure : true
+    secure : true,
+    sameSite : "strict",
+    maxAge : 15 * 60 * 60 * 1000
   }
 
   return res
   .status(200)
-  .cookie("accessToken", accessToken)
-  .cookie("refreshToken", refreshToken)
+  .cookie("accessToken", accessToken, options)
+  .cookie("refreshToken", refreshToken, options)
   .json(new ApiRes(200, loggedinUser, "User logged in Successfully"));
 })
 
@@ -93,4 +104,4 @@ const LogoutUser = asyncHandler(async(req, res) => {
   .json(new ApiRes(200, "User logged out Successfully"));
 });
 
-export { registerUser, loginUser, LogoutUser };
+export { signupUser, loginUser, LogoutUser };

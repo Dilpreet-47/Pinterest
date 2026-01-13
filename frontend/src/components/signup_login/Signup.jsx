@@ -1,5 +1,31 @@
-import React from 'react'
+import { useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 const Signup = ({onClose}) => {
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate();
+
+    const handleSignup = async() => {
+       
+        try {
+          const response = await axios.post('http://localhost:5000/api/v1/users/signup', {
+            email,
+            password
+        })
+        const token = response.data.token;
+        localStorage.setItem('accessToken', token);
+        navigate('/feed');
+        console.log(response.data);
+        } catch (error) {
+            setErrorMessage(error.response.data.message);
+            console.log(error.response.message);
+        }
+    }
+
   return (
     <div>
          {/* 4. The Modal Logic */}
@@ -25,19 +51,26 @@ const Signup = ({onClose}) => {
               <input 
                 type="email" 
                 placeholder="Email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-400" 
               />
               <input 
                 type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password" 
                 className="w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-400" 
               />
               
               <input type="date" className='w-full p-3 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-400'/>
 
-              <button className="w-full bg-red-600 text-white py-3 rounded-full font-bold text-lg hover:bg-red-700 transition">
+              <button
+                onClick={() => handleSignup()} 
+              className="w-full bg-red-600 text-white py-3 rounded-full font-bold text-lg hover:bg-red-700 transition">
                 Continue
               </button>
+              {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </form>
 
             <button 
